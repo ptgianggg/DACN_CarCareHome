@@ -23,3 +23,13 @@ export const login = async (user) => {
 
   return res.json();
 };
+
+export const getServices = async () => {
+  const res = await fetch(`${API_URL}/services`);
+  return res.json();
+};
+
+export const getServiceById = async (id) => {
+  const res = await fetch(`${API_URL}/services/${id}`);
+  return res.json();
+};

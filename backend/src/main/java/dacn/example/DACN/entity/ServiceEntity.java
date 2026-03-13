@@ -20,5 +20,17 @@ public class ServiceEntity {
 
     private Double price;
 
+    private Double originalPrice;
+
+    private Integer discountPercentage;
+
+    private String imageUrl;
+
+    private String storeName;
+
+    private String storeAddress;
+
+    private String duration;
+
     private Boolean active;
 }
