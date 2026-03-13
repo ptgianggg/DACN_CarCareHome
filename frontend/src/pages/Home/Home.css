@@ -1,0 +1,226 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600&display=swap");
+
+.home-page {
+  --home-bg: #050b1b;
+  --home-panel: rgba(17, 25, 48, 0.72);
+  --home-border: rgba(148, 163, 184, 0.24);
+  --home-text: #e2e8f0;
+  --home-muted: #94a3b8;
+  --home-primary: #3b82f6;
+  --home-accent: #06b6d4;
+  position: relative;
+  min-height: 100vh;
+  padding: 28px 42px 56px;
+  color: var(--home-text);
+  background: radial-gradient(circle at 10% -10%, rgba(59, 130, 246, 0.26), transparent 38%),
+    radial-gradient(circle at 100% 0, rgba(6, 182, 212, 0.24), transparent 35%),
+    linear-gradient(135deg, var(--home-bg) 0%, #0b1635 45%, #092f45 100%);
+  overflow: hidden;
+  font-family: "Manrope", sans-serif;
+}
+
+.home-glow {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.home-glow-1 {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: #3b82f6;
+  top: 30%;
+  left: -140px;
+}
+
+.home-glow-2 {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: #06b6d4;
+  bottom: -120px;
+  right: -120px;
+}
+
+.home-nav,
+.home-hero,
+.home-section {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.home-brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--home-primary), var(--home-accent));
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.home-nav-actions,
+.home-cta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-link-btn,
+.home-primary-btn,
+.home-secondary-btn {
+  border-radius: 14px;
+  padding: 11px 18px;
+  font-weight: 600;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.home-link-btn {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--home-text);
+}
+
+.home-primary-btn {
+  background: linear-gradient(135deg, var(--home-primary), #2563eb);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+}
+
+.home-secondary-btn {
+  border: 1px solid var(--home-border);
+  color: var(--home-text);
+  background: var(--home-panel);
+}
+
+.home-link-btn:hover,
+.home-primary-btn:hover,
+.home-secondary-btn:hover {
+  transform: translateY(-2px);
+}
+
+.home-hero {
+  margin-top: 58px;
+}
+
+.home-eyebrow {
+  margin: 0;
+  color: var(--home-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+}
+
+.home-hero h1,
+.home-section h2,
+.home-service-card h3 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+}
+
+.home-hero h1 {
+  margin-top: 14px;
+  max-width: 760px;
+  font-size: clamp(2rem, 4.8vw, 3.5rem);
+  line-height: 1.08;
+}
+
+.home-lead {
+  margin: 16px 0 0;
+  max-width: 620px;
+  color: var(--home-muted);
+  font-size: 1.02rem;
+}
+
+.home-cta-row {
+  margin-top: 24px;
+}
+
+.home-section {
+  margin-top: 46px;
+  padding: 24px;
+  border: 1px solid var(--home-border);
+  border-radius: 24px;
+  background: var(--home-panel);
+  backdrop-filter: blur(10px);
+}
+
+.home-section-alt {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(6, 182, 212, 0.1));
+}
+
+.home-section-head h2 {
+  margin-top: 8px;
+  font-size: clamp(1.35rem, 2.8vw, 2rem);
+}
+
+.home-service-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-service-card {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--home-border);
+  background: rgba(9, 14, 31, 0.58);
+}
+
+.home-service-card p {
+  margin: 10px 0;
+  color: var(--home-muted);
+  line-height: 1.55;
+}
+
+.home-service-card span {
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.home-step-list {
+  margin: 16px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.home-step-list li {
+  color: var(--home-text);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .home-page {
+    padding: 20px 20px 36px;
+  }
+
+  .home-service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero {
+    margin-top: 36px;
+  }
+}
