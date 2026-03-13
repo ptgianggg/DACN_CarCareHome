@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+<<<<<<< HEAD
 import Register from "./pages/Register";
 import Service from "./pages/Service/Service";
 import ServiceList from "./pages/ServiceList/ServiceList";
@@ -26,6 +27,25 @@ function App() {
         </Routes>
       </div>
     </BrowserRouter>
+=======
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+function App() {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+>>>>>>> 3532084bd38e2370e0bf7cf5e5304cc9bc0e2d11
   );
 }
 
