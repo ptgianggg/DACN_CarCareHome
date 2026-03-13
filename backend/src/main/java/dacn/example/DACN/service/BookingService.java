@@ -3,7 +3,9 @@ package dacn.example.DACN.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import dacn.example.DACN.dto.BookingRequest;
 import dacn.example.DACN.entity.Booking;
@@ -50,9 +52,28 @@ public class BookingService {
         booking.setServiceType(request.getServiceType());
         booking.setBookingDate(request.getBookingDate());
         booking.setBookingTime(request.getBookingTime());
-        booking.setBranchName(request.getBranchName());
+        booking.setAddressName(request.getAddressName());
         booking.setNote(request.getNote());
         booking.setStatus(request.getStatus());
         booking.setTotalPrice(request.getTotalPrice());
+
+        java.math.BigDecimal total =
+                request.getTotalPrice() != null ? request.getTotalPrice() : java.math.BigDecimal.ZERO;
+        java.math.BigDecimal deposit =
+                request.getDepositAmount() != null ? request.getDepositAmount() : java.math.BigDecimal.ZERO;
+
+        if (deposit.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tien coc khong duoc am");
+        }
+
+        java.math.BigDecimal maxDeposit = total.multiply(new java.math.BigDecimal("0.5"));
+        if (deposit.compareTo(maxDeposit) > 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Tien coc khong duoc vuot qua 50% tong tien dich vu"
+            );
+        }
+
+        booking.setDepositAmount(deposit);
     }
 }

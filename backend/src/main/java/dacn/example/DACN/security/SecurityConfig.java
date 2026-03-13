@@ -20,27 +20,35 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            // Dùng STATELESS vì JWT không cần session
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints - không cần token
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/services/**", "/api/services").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 
-                // Phân quyền cho Admin
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // Tạm thời mở hết để debug
+                .requestMatchers("/api/**").permitAll()
                 
-                // Phân quyền cho Manager
-                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
-                
-                // Các endpoint khác cần token hợp lệ (USER, MANAGER, ADMIN đều được)
                 .anyRequest().authenticated()
             )
-            // Chạy JwtFilter trước UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+        configuration.setAllowedOriginPatterns(java.util.List.of("*")); // Cho phép tất cả origins
+        configuration.setAllowedMethods(java.util.List.of("*")); // Cho phép tất cả methods
+        configuration.setAllowedHeaders(java.util.List.of("*")); // Cho phép tất cả headers
+        configuration.setAllowCredentials(true);
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

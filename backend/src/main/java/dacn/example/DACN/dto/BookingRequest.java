@@ -17,8 +17,9 @@ public class BookingRequest {
     private String serviceType;
     private LocalDate bookingDate;
     private LocalTime bookingTime;
-    private String branchName;
+    private String addressName;
     private String note;
     private String status;
     private BigDecimal totalPrice;
+    private BigDecimal depositAmount;
 }

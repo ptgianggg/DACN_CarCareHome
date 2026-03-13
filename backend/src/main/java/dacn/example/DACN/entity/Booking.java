@@ -48,8 +48,8 @@ public class Booking {
     @Column(name = "booking_time", nullable = false)
     private LocalTime bookingTime;
 
-    @Column(name = "branch_name", nullable = false, length = 120)
-    private String branchName;
+    @Column(name = "address_name", nullable = false, length = 120)
+    private String addressName;
 
     @Column(length = 500)
     private String note;
@@ -59,6 +59,9 @@ public class Booking {
 
     @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPrice;
+
+    @Column(name = "deposit_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal depositAmount;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -74,6 +77,9 @@ public class Booking {
         }
         if (totalPrice == null) {
             totalPrice = BigDecimal.ZERO;
+        }
+        if (depositAmount == null) {
+            depositAmount = BigDecimal.ZERO;
         }
         createdAt = now;
         updatedAt = now;
