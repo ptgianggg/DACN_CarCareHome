@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 

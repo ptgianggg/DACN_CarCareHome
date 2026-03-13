@@ -48,7 +48,12 @@ public class AuthService {
         user.setEmail(request.getEmail());
         // Hash password trước khi lưu
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
+        // Mặc định gán role USER (Id = 2 theo enum)
+        // Lưu ý: Bạn cần đảm bảo trong DB đã có record với ID = 2 trong bảng role
+        dacn.example.DACN.entity.Role defaultRole = new dacn.example.DACN.entity.Role();
+        defaultRole.setId(2L);
+        user.setRole(defaultRole);
+
 
         User savedUser = userRepository.save(user);
 
@@ -56,7 +61,7 @@ public class AuthService {
         response.put("id", savedUser.getId());
         response.put("name", savedUser.getName());
         response.put("email", savedUser.getEmail());
-        response.put("role", savedUser.getRole());
+        response.put("role", savedUser.getRole().getName());
         response.put("message", "Đăng ký thành công!");
         return response;
     }
@@ -71,15 +76,17 @@ public class AuthService {
             throw new RuntimeException("Mật khẩu không đúng.");
         }
 
-        // Tạo JWT token
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        // Tạo JWT token (lấy tên của Role)
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().getName());
+
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", user.getId());
         response.put("name", user.getName());
         response.put("email", user.getEmail());
-        response.put("role", user.getRole());
+        response.put("role", user.getRole().getName());
         response.put("token", token); // ← Trả về JWT Access Token
+
         response.put("message", "Đăng nhập thành công!");
         return response;
     }
@@ -104,20 +111,23 @@ public class AuthService {
                     user = new User();
                     user.setEmail(email);
                     user.setName(name);
-                    user.setRole("USER");
-                    // Người dùng Google không cần password cục bộ, có thể để trống hoặc set ngẫu
-                    // nhiên
+                    
+                    dacn.example.DACN.entity.Role defaultRole = new dacn.example.DACN.entity.Role();
+                    defaultRole.setId(2L); // 2L là USER theo Enum Role
+                    user.setRole(defaultRole);
+                    
+                    // Người dùng Google không cần password cục bộ
                     user = userRepository.save(user);
                 }
 
-                // Tạo JWT token của hệ thống
-                String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+                // Tạo JWT token (lấy tên của Role)
+                String token = jwtUtil.generateToken(user.getEmail(), user.getRole().getName());
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("id", user.getId());
                 response.put("name", user.getName());
                 response.put("email", user.getEmail());
-                response.put("role", user.getRole());
+                response.put("role", user.getRole().getName());
                 response.put("token", token);
                 response.put("message", "Đăng nhập Google thành công!");
                 return response;

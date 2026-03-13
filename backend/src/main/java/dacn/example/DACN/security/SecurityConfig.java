@@ -28,7 +28,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints - không cần token
                 .requestMatchers("/api/auth/**").permitAll()
-                // Các endpoint khác cần token hợp lệ
+                
+                // Phân quyền cho Admin
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
+                // Phân quyền cho Manager
+                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
+                
+                // Các endpoint khác cần token hợp lệ (USER, MANAGER, ADMIN đều được)
                 .anyRequest().authenticated()
             )
             // Chạy JwtFilter trước UsernamePasswordAuthenticationFilter
