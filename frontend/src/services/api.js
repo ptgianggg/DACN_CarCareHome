@@ -62,7 +62,6 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
   return res.json();
 };
 
-<<<<<<< HEAD
 export const getServices = async () => {
   const res = await fetch(`${API_URL}/services`);
   return res.json();
@@ -71,10 +70,10 @@ export const getServices = async () => {
 export const getServiceById = async (id) => {
   const res = await fetch(`${API_URL}/services/${id}`);
   return res.json();
-=======
+};
+
 // Logout: xoá token và user khỏi localStorage
 export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
->>>>>>> 3532084bd38e2370e0bf7cf5e5304cc9bc0e2d11
 };
