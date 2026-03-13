@@ -1,15 +1,14 @@
-import Register from "./pages/Register"
+import Dashboard from "./pages/Admin/Dashboard";
+import ServiceManagement from "./pages/Admin/Services";
 
 function App() {
+  const path = window.location.pathname.toLowerCase();
 
-return(
-<div>
+  if (path === "/services") {
+    return <ServiceManagement />;
+  }
 
-<Register/>
-
-</div>
-)
-
+  return <Dashboard />;
 }
 
-export default App
+export default App;
