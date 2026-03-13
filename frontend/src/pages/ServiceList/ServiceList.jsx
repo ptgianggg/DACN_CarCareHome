@@ -67,7 +67,7 @@ const ServiceList = () => {
                   <p className="service-description">{service.description}</p>
                   {service.duration && (
                     <span className="service-duration">
-                      <span className="icon-clock">🕒</span> {service.duration}
+                      <span className="icon-clock">🕒</span> {service.duration} phút
                     </span>
                   )}
                 </div>

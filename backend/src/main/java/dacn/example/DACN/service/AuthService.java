@@ -28,6 +28,9 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private dacn.example.DACN.repository.RoleRepository roleRepository;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -48,10 +51,9 @@ public class AuthService {
         user.setEmail(request.getEmail());
         // Hash password trước khi lưu
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // Mặc định gán role USER (Id = 2 theo enum)
-        // Lưu ý: Bạn cần đảm bảo trong DB đã có record với ID = 2 trong bảng role
-        dacn.example.DACN.entity.Role defaultRole = new dacn.example.DACN.entity.Role();
-        defaultRole.setId(2L);
+        // Mặc định gán role USER (Id = 2 theo Enum)
+        dacn.example.DACN.entity.Role defaultRole = roleRepository.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Lỗi hệ thống: Không tìm thấy quyền USER."));
         user.setRole(defaultRole);
 
 
@@ -112,8 +114,8 @@ public class AuthService {
                     user.setEmail(email);
                     user.setName(name);
                     
-                    dacn.example.DACN.entity.Role defaultRole = new dacn.example.DACN.entity.Role();
-                    defaultRole.setId(2L); // 2L là USER theo Enum Role
+                    dacn.example.DACN.entity.Role defaultRole = roleRepository.findById(2L)
+                            .orElseThrow(() -> new RuntimeException("Lỗi hệ thống: Không tìm thấy quyền USER."));
                     user.setRole(defaultRole);
                     
                     // Người dùng Google không cần password cục bộ

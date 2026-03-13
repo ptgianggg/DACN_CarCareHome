@@ -18,19 +18,14 @@ public class ServiceEntity {
 
     private String description;
 
+    private String category;
+
     private Double price;
 
-    private Double originalPrice;
-
-    private Integer discountPercentage;
 
     private String imageUrl;
 
-    private String storeName;
-
-    private String storeAddress;
-
-    private String duration;
+    private Integer duration;
 
     private Boolean active;
 }

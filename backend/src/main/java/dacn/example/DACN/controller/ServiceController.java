@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/services")
 public class ServiceController {
@@ -27,6 +26,7 @@ public class ServiceController {
 
     @PostMapping
     public ServiceEntity createService(@RequestBody ServiceEntity service) {
+        System.out.println("DEBUG: ServiceController - Creating service: " + service.getName());
         return serviceService.saveService(service);
     }
 
