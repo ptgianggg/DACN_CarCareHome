@@ -1,15 +1,22 @@
-import Register from "./pages/Register"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function App() {
-
-return(
-<div>
-
-<Register/>
-
-</div>
-)
-
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+  );
 }
 
-export default App
+export default App;
