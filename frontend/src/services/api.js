@@ -1,5 +1,24 @@
 const API_URL = "http://localhost:8080/api";
 
+const parseErrorMessage = async (res, fallback) => {
+  let message = fallback;
+  try {
+    const text = await res.text();
+    if (!text) {
+      return `[${res.status}] ${message}`;
+    }
+    try {
+      const obj = JSON.parse(text);
+      message = obj?.message || obj?.error || text;
+    } catch {
+      message = text;
+    }
+  } catch (error) {
+    console.debug("Cannot parse error response:", error);
+  }
+  return `[${res.status}] ${message}`;
+};
+
 // ===============================
 // TOKEN
 // ===============================
@@ -148,31 +167,67 @@ export const getServiceById = async (id) => {
 };
 
 export const createService = async (service) => {
-
-  return fetchWithAuth("/services", {
+  const res = await fetch(`${API_URL}/services`, {
     method: "POST",
-    body: JSON.stringify(service)
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(service),
   });
 
+  if (!res.ok) {
+    const message = await parseErrorMessage(res, "Khong the tao dich vu");
+    return { error: true, message };
+  }
+
+  return res.json();
 };
 
 export const updateService = async (id, service) => {
-
-  return fetchWithAuth(`/services/${id}`, {
+  const res = await fetch(`${API_URL}/services/${id}`, {
     method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(service)
   });
 
+  if (!res.ok) {
+    const message = await parseErrorMessage(res, "Khong the cap nhat dich vu");
+    return { error: true, message };
+  }
+
+  return res.json();
 };
 
 export const deleteService = async (id) => {
 
   const res = await fetch(`${API_URL}/services/${id}`, {
-    method: "DELETE",
-    headers: authHeaders()
+    method: "DELETE"
   });
 
   return res.ok;
+};
+
+// ===============================
+// BOOKINGS
+// ===============================
+
+export const createBooking = async (booking) => {
+  const res = await fetch(`${API_URL}/bookings`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(booking),
+  });
+
+  if (!res.ok) {
+    const message = await parseErrorMessage(res, "Khong the tao lich hen");
+    return { error: true, message };
+  }
+
+  return res.json();
 };
 
 // ===============================
@@ -187,3 +242,11 @@ export const logout = () => {
   window.location.href = "/login";
 
 };
+
+export const getBookings = async () => {
+  const res = await fetch(`${API_URL}/bookings`);
+  if (!res.ok) return [];
+  return res.json();
+};
+
+

@@ -1,6 +1,13 @@
-import { useMemo, useState, useEffect } from "react";
-import { getServices, createService, updateService, deleteService } from "../../services/api";
+import { useEffect, useState } from "react";
+import {
+  createService,
+  deleteService,
+  getServices,
+  updateService,
+} from "../../services/api";
 import "./style.css";
+
+const LOCAL_IMAGE_MAP_KEY = "service_local_images";
 
 const emptyForm = {
   name: "",
@@ -9,19 +16,45 @@ const emptyForm = {
   category: "",
   description: "",
   image: "",
-  active: true
+  active: true,
 };
 
 function formatPrice(value) {
-  return `${Number(value).toLocaleString("vi-VN")} đ`;
+  return `${Number(value || 0).toLocaleString("vi-VN")} d`;
+}
+
+function normalizeService(service) {
+  return {
+    id: service.id,
+    name: service.name || "",
+    category: service.category || "",
+    description: service.description || "",
+    price: Number(service.price || 0),
+    duration: Number(service.duration || 0),
+    imageUrl: service.imageUrl || "",
+    active: service.active ?? true,
+  };
 }
 
 function ServiceManagement() {
-
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [detailService, setDetailService] = useState(null);
+  const [localImageMap, setLocalImageMap] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LOCAL_IMAGE_MAP_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_IMAGE_MAP_KEY, JSON.stringify(localImageMap));
+  }, [localImageMap]);
 
   useEffect(() => {
     fetchData();
@@ -29,28 +62,21 @@ function ServiceManagement() {
 
   async function fetchData() {
     setLoading(true);
-
     try {
       const data = await getServices();
-      setServices(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Fetch services error:", err);
+      const list = Array.isArray(data) ? data.map(normalizeService) : [];
+      setServices(list);
+    } catch (error) {
+      console.error("Fetch services error:", error);
+      setServices([]);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
-  const totalPrice = useMemo(() => {
-    return services.reduce((sum, item) => sum + (item.price || 0), 0);
-  }, [services]);
-
-  function onChange(e) {
-    const { name, value } = e.target;
-
-    setForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  function onChange(event) {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function resetForm() {
@@ -58,33 +84,48 @@ function ServiceManagement() {
     setEditingId(null);
   }
 
-  function onImageChange(e) {
-    const file = e.target.files?.[0];
+  function onAddClick() {
+    resetForm();
+    setIsFormOpen(true);
+  }
+
+  function closeForm() {
+    setIsFormOpen(false);
+    resetForm();
+  }
+
+  function closeDetailModal() {
+    setDetailService(null);
+  }
+
+  function resolveImageUrl(service) {
+    return localImageMap[String(service.id)] || service.imageUrl || "";
+  }
+
+  function onImageChange(event) {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-
     reader.onload = () => {
-      setForm(prev => ({
-        ...prev,
-        image: reader.result
-      }));
+      setForm((prev) => ({ ...prev, image: String(reader.result || "") }));
     };
-
     reader.readAsDataURL(file);
   }
 
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(event) {
+    event.preventDefault();
+
+    const imageUrlToSave = form.image?.startsWith("data:") ? "" : form.image || "";
 
     const payload = {
       name: form.name.trim(),
       category: form.category.trim(),
       description: form.description.trim(),
       price: Number(form.price),
-      duration: Number(form.duration) || 0,
-      imageUrl: form.image || "",
-      active: form.active
+      duration: Number(form.duration),
+      imageUrl: imageUrlToSave,
+      active: Boolean(form.active),
     };
 
     if (
@@ -92,77 +133,76 @@ function ServiceManagement() {
       !payload.category ||
       !payload.description ||
       Number.isNaN(payload.price) ||
-      payload.price <= 0
+      Number.isNaN(payload.duration) ||
+      payload.price <= 0 ||
+      payload.duration <= 0
     ) {
-      alert("Vui lòng nhập đầy đủ thông tin hợp lệ");
+      alert("Vui long nhap day du thong tin hop le");
       return;
     }
 
     try {
+      const result = editingId
+        ? await updateService(editingId, payload)
+        : await createService(payload);
 
-      console.log("Payload gửi lên:", payload);
-
-      let res;
-
-      if (editingId) {
-        res = await updateService(editingId, payload);
-      } else {
-        res = await createService(payload);
+      if (result?.error) {
+        alert(result.message || "Khong the luu dich vu");
+        return;
       }
 
-      console.log("Response:", res);
-
-      if (res && !res.error) {
-        alert("Lưu dịch vụ thành công");
-        fetchData();
-        resetForm();
-      } else {
-        alert(res?.message || "Không thể lưu dịch vụ");
+      const savedId = editingId || result?.id;
+      if (savedId && form.image?.startsWith("data:")) {
+        setLocalImageMap((prev) => ({
+          ...prev,
+          [String(savedId)]: form.image,
+        }));
       }
 
-    } catch (err) {
-      console.error("Create service error:", err);
-      alert("Có lỗi xảy ra khi lưu dịch vụ");
+      await fetchData();
+      closeForm();
+    } catch (error) {
+      console.error("Save service error:", error);
+      alert("Co loi xay ra khi luu dich vu");
     }
   }
 
   function onEdit(service) {
-
     setEditingId(service.id);
-
     setForm({
-      name: service.name || "",
-      price: String(service.price || ""),
-      duration: String(service.duration || ""),
-      category: service.category || "",
-      description: service.description || "",
-      image: service.imageUrl || "",
-      active: service.active ?? true
+      name: service.name,
+      price: String(service.price),
+      duration: String(service.duration),
+      category: service.category,
+      description: service.description,
+      image: resolveImageUrl(service),
+      active: service.active,
     });
+    setIsFormOpen(true);
   }
 
   async function onDelete(id) {
-
-    if (!window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) return;
+    if (!window.confirm("Ban co chac chan muon xoa dich vu nay?")) return;
 
     try {
-
       const ok = await deleteService(id);
-
       if (!ok) {
-        alert("Xóa thất bại");
+        alert("Xoa that bai");
         return;
       }
 
-      fetchData();
+      setLocalImageMap((prev) => {
+        const next = { ...prev };
+        delete next[String(id)];
+        return next;
+      });
 
-      if (editingId === id) {
-        resetForm();
-      }
-
-    } catch (err) {
-      console.error("Delete service error:", err);
-      alert("Không thể xóa dịch vụ");
+      await fetchData();
+      if (editingId === id) closeForm();
+      if (detailService?.id === id) closeDetailModal();
+    } catch (error) {
+      console.error("Delete service error:", error);
+      alert("Khong the xoa dich vu");
     }
   }
 
@@ -170,139 +210,264 @@ function ServiceManagement() {
     <>
       <header className="topbar">
         <div>
-          <p className="eyebrow">Dịch vụ</p>
-          <h2>Quản lý danh mục dịch vụ</h2>
+          <p className="eyebrow">Dich vu</p>
+          <h2>Quan ly danh muc dich vu</h2>
+          <p className="topbar-copy">Double click vao dong de xem chi tiet dich vu.</p>
         </div>
       </header>
 
       <section className="service-layout">
-
-        {/* FORM */}
-
-        <article className="panel service-form-panel">
-
+        <article className="panel service-table-panel">
           <div className="panel-heading">
-            <h3>{editingId ? "Sửa dịch vụ" : "Thêm dịch vụ"}</h3>
+            <div>
+              <p className="eyebrow">Danh sach</p>
+              <h3>Dich vu hien co ({services.length})</h3>
+            </div>
+            <button type="button" className="primary-button" onClick={onAddClick}>
+              Thêm
+            </button>
           </div>
 
-          <form className="service-form" onSubmit={onSubmit}>
+          <div className="service-table">
+            <div className="service-table-head">
+              <span>Ten</span>
+              <span>Nhom</span>
+              <span>Mo ta</span>
+              <span>Anh</span>
+              <span>Gia</span>
+              <span>Thoi gian</span>
+              <span>Trang thai</span>
+              <span>Tac vu</span>
+            </div>
 
-            <input
-              name="name"
-              placeholder="Tên dịch vụ"
-              value={form.name}
-              onChange={onChange}
-              required
-            />
+            {loading ? <p>Dang tai du lieu...</p> : null}
 
-            <input
-              name="price"
-              type="number"
-              placeholder="Giá"
-              value={form.price}
-              onChange={onChange}
-              required
-            />
+            {!loading &&
+              services.map((service) => (
+                <div
+                  key={service.id}
+                  className="service-table-row"
+                  onDoubleClick={() => setDetailService(service)}
+                >
+                  <span>{service.name}</span>
+                  <span>{service.category}</span>
+                  <span className="service-description">{service.description}</span>
+                  <span>
+                    {resolveImageUrl(service) ? (
+                      <img
+                        className="service-thumb"
+                        src={resolveImageUrl(service)}
+                        alt={service.name}
+                      />
+                    ) : (
+                      <span className="no-image">Chua co anh</span>
+                    )}
+                  </span>
+                  <span>{formatPrice(service.price)}</span>
+                  <span>{service.duration} phut</span>
+                  <span>
+                    <span className={`status-badge ${service.active ? "active" : "inactive"}`}>
+                      {service.active ? "Hoat dong" : "Tam dung"}
+                    </span>
+                  </span>
+                  <span
+                    className="row-actions"
+                    onDoubleClick={(event) => event.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      className="ghost-button action-button"
+                      onClick={() => onEdit(service)}
+                    >
+                      Sua
+                    </button>
+                    <button
+                      type="button"
+                      className="danger-button action-button"
+                      onClick={() => onDelete(service.id)}
+                    >
+                      Xoa
+                    </button>
+                  </span>
+                </div>
+              ))}
 
-            <input
-              name="duration"
-              type="number"
-              placeholder="Thời gian"
-              value={form.duration}
-              onChange={onChange}
-            />
-
-            <input
-              name="category"
-              placeholder="Nhóm dịch vụ"
-              value={form.category}
-              onChange={onChange}
-              required
-            />
-
-            <input
-              name="description"
-              placeholder="Mô tả"
-              value={form.description}
-              onChange={onChange}
-              required
-            />
-
-            <label>
-              Hoạt động
-              <input
-                type="checkbox"
-                checked={form.active}
-                onChange={(e) =>
-                  setForm(prev => ({
-                    ...prev,
-                    active: e.target.checked
-                  }))
-                }
-              />
-            </label>
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={onImageChange}
-            />
-
-            {form.image && (
-              <img
-                src={form.image}
-                alt="preview"
-                style={{ width: 120 }}
-              />
-            )}
-
-            <button type="submit">
-              {editingId ? "Cập nhật" : "Thêm dịch vụ"}
-            </button>
-
-            <button type="button" onClick={resetForm}>
-              Làm mới
-            </button>
-
-          </form>
-        </article>
-
-
-        {/* TABLE */}
-
-        <article className="panel service-table-panel">
-
-          <h3>Dịch vụ ({services.length})</h3>
-
-          {loading ? (
-            <p>Đang tải...</p>
-          ) : (
-            services.map(service => (
-              <div key={service.id} className="service-table-row">
-
-                <span>{service.name}</span>
-
-                <span>{service.category}</span>
-
-                <span>{formatPrice(service.price)}</span>
-
-                <span>{service.duration} phút</span>
-
-                <button onClick={() => onEdit(service)}>
-                  Sửa
-                </button>
-
-                <button onClick={() => onDelete(service.id)}>
-                  Xóa
-                </button>
-
+            {!loading && !services.length ? (
+              <div className="empty-state">
+                <p>Chua co dich vu. Bam Them de tao moi.</p>
               </div>
-            ))
-          )}
-
+            ) : null}
+          </div>
         </article>
-
       </section>
+
+      {isFormOpen ? (
+        <div className="service-modal-backdrop" onClick={closeForm}>
+          <article className="panel service-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="panel-heading">
+              <div>
+                <p className="eyebrow">{editingId ? "Cap nhat" : "Tao moi"}</p>
+                <h3>{editingId ? "Sua dich vu" : "Them dich vu"}</h3>
+              </div>
+            </div>
+
+            <form className="service-form" onSubmit={onSubmit}>
+              <label>
+                Ten dich vu
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={onChange}
+                  placeholder="Nhap ten dich vu"
+                  required
+                />
+              </label>
+
+              <label>
+                Gia (VND)
+                <input
+                  name="price"
+                  type="number"
+                  min="1000"
+                  step="1000"
+                  value={form.price}
+                  onChange={onChange}
+                  placeholder="Vi du: 1500000"
+                  required
+                />
+              </label>
+
+              <label>
+                Thoi gian (phut)
+                <input
+                  name="duration"
+                  type="number"
+                  min="10"
+                  step="5"
+                  value={form.duration}
+                  onChange={onChange}
+                  placeholder="Vi du: 120"
+                  required
+                />
+              </label>
+
+              <label>
+                Nhom dich vu
+                <input
+                  name="category"
+                  value={form.category}
+                  onChange={onChange}
+                  placeholder="Bao duong / Noi that..."
+                  required
+                />
+              </label>
+
+              <label>
+                Mo ta
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={onChange}
+                  placeholder="Mo ta chi tiet ve dich vu..."
+                  rows={3}
+                  required
+                />
+              </label>
+
+              <label className="toggle-label">
+                Trang thai hoat dong
+                <span className="switch">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, active: event.target.checked }))
+                    }
+                  />
+                  <span className="slider" />
+                </span>
+              </label>
+
+              <label>
+                Upload anh
+                <input type="file" accept="image/*" onChange={onImageChange} />
+                <small className="no-image">Anh tu may tinh chi dung de preview tam thoi.</small>
+              </label>
+
+              {form.image ? (
+                <div className="service-image-preview">
+                  <img src={form.image} alt="Service preview" />
+                </div>
+              ) : null}
+
+              <div className="service-form-actions">
+                <button type="submit" className="primary-button">
+                  {editingId ? "Luu thay doi" : "Them dich vu"}
+                </button>
+                <button type="button" className="ghost-button" onClick={closeForm}>
+                  Dong
+                </button>
+              </div>
+            </form>
+          </article>
+        </div>
+      ) : null}
+
+      {detailService ? (
+        <div className="service-modal-backdrop" onClick={closeDetailModal}>
+          <article className="panel service-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="panel-heading">
+              <div>
+                <p className="eyebrow">Chi tiet</p>
+                <h3>{detailService.name}</h3>
+              </div>
+            </div>
+
+            <div className="service-detail">
+              <div className="service-detail-image">
+                {resolveImageUrl(detailService) ? (
+                  <img src={resolveImageUrl(detailService)} alt={detailService.name} />
+                ) : (
+                  <span className="no-image">Chua co anh</span>
+                )}
+              </div>
+              <div className="service-detail-grid">
+                <p>
+                  <strong>Nhom:</strong> {detailService.category}
+                </p>
+                <p>
+                  <strong>Gia:</strong> {formatPrice(detailService.price)}
+                </p>
+                <p>
+                  <strong>Thoi gian:</strong> {detailService.duration} phut
+                </p>
+                <p>
+                  <strong>Trang thai:</strong> {detailService.active ? "Hoat dong" : "Tam dung"}
+                </p>
+                <p className="service-detail-description">
+                  <strong>Mo ta:</strong> {detailService.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="service-form-actions">
+              <button
+                type="button"
+                className="ghost-button"
+                onClick={() => {
+                  closeDetailModal();
+                  onEdit(detailService);
+                }}
+              >
+                Sua
+              </button>
+              <button type="button" className="ghost-button" onClick={closeDetailModal}>
+                Dong
+              </button>
+            </div>
+          </article>
+        </div>
+      ) : null}
     </>
   );
 }

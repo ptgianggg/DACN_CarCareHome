@@ -1,40 +1,43 @@
+.service-detail-page {
+  max-width: 1100px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+}
+
 .service-detail-card {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  margin-top: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
 }
 
 .btn-back {
-  background: none;
   border: none;
-  color: #64748b;
-  font-weight: 600;
+  background: transparent;
+  color: #334155;
+  font-weight: 700;
   cursor: pointer;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
+  margin-bottom: 18px;
+  padding: 0;
 }
 
 .btn-back:hover {
-  color: #1e293b;
+  color: #0f172a;
 }
 
-.detail-header-v2 {
+.service-detail-layout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 2.5rem;
-  margin-bottom: 2.5rem;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
+  gap: 22px;
+  align-items: start;
 }
 
 .detail-image-box {
-  position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   background: #f8fafc;
-  aspect-ratio: 4/3;
+  aspect-ratio: 4 / 3;
 }
 
 .main-service-img {
@@ -43,129 +46,137 @@
   object-fit: cover;
 }
 
-.discount-badge-large {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: #ef4444;
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 99px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
-}
-
 .detail-main-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  gap: 14px;
 }
 
 .detail-title {
-  font-size: 2.25rem;
-  font-weight: 800;
+  margin: 0;
   color: #0f172a;
-  margin: 0 0 1rem;
+  font-size: clamp(1.45rem, 2.3vw, 2rem);
   line-height: 1.2;
+}
+
+.detail-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  color: #1e3a8a;
+  background: #dbeafe;
+  font-weight: 600;
 }
 
 .price-section {
   display: flex;
-  align-items: baseline;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  align-items: center;
 }
 
 .detail-current-price {
-  font-size: 1.8rem;
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
   font-weight: 800;
-  color: #2c3e50;
+  color: #0f172a;
 }
 
-.detail-original-price {
-  font-size: 1.25rem;
-  color: #94a3b8;
-  text-decoration: line-through;
-}
-
-.store-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #f1f5f9;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+.detail-short-desc {
+  margin: 0;
   color: #475569;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  width: fit-content;
+  line-height: 1.65;
 }
 
-.duration-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #1e293b;
-  font-size: 0.95rem;
-  margin-bottom: 2rem;
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.duration-badge strong {
-  margin-left: 4px;
-  color: #2c3e50;
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .btn-primary-solid {
-  background: #2c3e50;
-  color: white;
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.26);
 }
 
 .btn-primary-solid:hover {
-  background: #1a252f;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
 }
 
 .detail-description {
+  margin-top: 22px;
   border-top: 1px solid #e2e8f0;
-  padding-top: 2rem;
+  padding-top: 18px;
 }
 
 .detail-description h3 {
-  font-size: 1.25rem;
+  margin: 0 0 10px;
   color: #0f172a;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 
 .detail-description p {
-  line-height: 1.7;
+  margin: 0;
   color: #475569;
-  margin-bottom: 1.5rem;
+  line-height: 1.7;
 }
 
 .address-info {
+  margin-top: 14px;
+  border-radius: 12px;
+  padding: 12px 14px;
   background: #f8fafc;
-  padding: 1rem;
-  border-radius: 8px;
-  color: #64748b;
-  font-size: 0.95rem;
+  color: #334155;
 }
 
-@media (max-width: 768px) {
-  .detail-header-v2 {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+.loading,
+.error {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+
+.loading {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+@media (max-width: 820px) {
+  .service-detail-card {
+    padding: 18px;
+    border-radius: 16px;
   }
-  .detail-title {
-    font-size: 1.75rem;
+
+  .service-detail-layout {
+    grid-template-columns: 1fr;
   }
 }
