@@ -27,6 +27,12 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        
+        // Skip if already authenticated
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Kiểm tra header có dạng "Bearer <token>" không
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -36,15 +42,24 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token);
 
-                // Tạo authentication object và set vào SecurityContext
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                        );
+                System.out.println("DEBUG: JwtFilter - Email: " + email + ", Role from token: " + role);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (email != null && role != null) {
+                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
+                    System.out.println("DEBUG: JwtFilter - Setting authority: " + authority.getAuthority());
+                    
+                    // Tạo authentication object và set vào SecurityContext
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    email,
+                                    null,
+                                    List.of(authority)
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } else {
+                System.out.println("DEBUG: JwtFilter - Token validation failed");
             }
         }
 
