@@ -235,6 +235,49 @@ export const deleteService = async (id) => {
 };
 
 // ===============================
+// CATEGORIES
+// ===============================
+
+export const getCategories = async () => {
+  const res = await fetch(`${API_URL}/categories`);
+  if (!res.ok) return [];
+  return res.json();
+};
+
+export const createCategory = async (category) => {
+  const res = await fetch(`${API_URL}/categories`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(category)
+  });
+  if (!res.ok) {
+    const message = await parseErrorMessage(res, "Khong the tao danh muc");
+    return { error: true, message };
+  }
+  return res.json();
+};
+
+export const updateCategory = async (id, category) => {
+  const res = await fetch(`${API_URL}/categories/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(category)
+  });
+  if (!res.ok) {
+    const message = await parseErrorMessage(res, "Khong the cap nhat danh muc");
+    return { error: true, message };
+  }
+  return res.json();
+};
+
+export const deleteCategory = async (id) => {
+  const res = await fetch(`${API_URL}/categories/${id}`, {
+    method: "DELETE"
+  });
+  return res.ok;
+};
+
+// ===============================
 // BOOKINGS
 // ===============================
 

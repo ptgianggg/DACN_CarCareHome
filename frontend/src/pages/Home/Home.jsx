@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getServices } from "../../services/api";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import "./Home.css";
 
 const steps = [
@@ -83,6 +85,7 @@ function Home() {
   }
 
   return (
+<<<<<<< HEAD
     <main className="home-page">
       <div className="home-glow home-glow-1" />
       <div className="home-glow home-glow-2" />
@@ -155,6 +158,13 @@ function Home() {
           )}
         </div>
       </header>
+=======
+    <>
+      <Header />
+      <main className="home-page">
+        <div className="home-glow home-glow-1" />
+        <div className="home-glow home-glow-2" />
+>>>>>>> 8492f561211e25f67d502094d51cbdf385d04987
 
       <section className="home-hero">
         <p className="home-eyebrow">Premium Auto Care</p>
@@ -230,7 +240,9 @@ function Home() {
           TP.HCM.
         </p>
       </section>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }
 

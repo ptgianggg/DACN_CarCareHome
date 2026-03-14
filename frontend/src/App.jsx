@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ServiceList from "./pages/ServiceList/ServiceList";
-import ServiceDetail from "./pages/ServiceDetail/ServiceDetail";
 import Booking from "./pages/Booking/Booking";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Dashboard from "./pages/Admin/Dashboard";
@@ -9,7 +8,9 @@ import BookingManagement from "./pages/Admin/Bookings";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import AdminPage from "./pages/Admin/AdminPage";
+import CategoryManagement from "./pages/Admin/Categories";
 import Home from "./pages/Home/Home";
+import ServiceDetail from "./pages/ServiceDetail/ServiceDetail";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -98,7 +99,43 @@ function App() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+<<<<<<< HEAD
       {appRouter}
+=======
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="categories" element={<CategoryManagement />} />
+            <Route path="services" element={<ServiceManagement />} />
+            <Route path="bookings" element={<BookingManagement />} />
+            <Route path="customers" element={<AdminPlaceholder title="Quan ly khach hang" />} />
+            <Route path="staffs" element={<AdminPlaceholder title="Quan ly nhan vien" />} />
+            <Route path="reports" element={<AdminPlaceholder title="Bao cao thong ke" />} />
+            <Route path="settings" element={<AdminPlaceholder title="Cai dat" />} />
+            <Route index element={<Navigate to="services" replace />} />
+            <Route path="*" element={<Navigate to="services" replace />} />
+          </Route>
+          <Route path="/services" element={<ServiceList />} />
+          <Route path="/services/:categoryName" element={<ServiceList />} />
+          <Route path="/services/detail/:id" element={<ServiceDetail />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/service" element={<Navigate to="/services" replace />} />
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+>>>>>>> 8492f561211e25f67d502094d51cbdf385d04987
     </GoogleOAuthProvider>
   );
 }
