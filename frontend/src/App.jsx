@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ServiceList from "./pages/ServiceList/ServiceList";
-import ServiceDetail from "./pages/ServiceDetail/ServiceDetail";
 import Booking from "./pages/Booking/Booking";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Dashboard from "./pages/Admin/Dashboard";
@@ -9,7 +8,9 @@ import BookingManagement from "./pages/Admin/Bookings";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import AdminPage from "./pages/Admin/AdminPage";
+import CategoryManagement from "./pages/Admin/Categories";
 import Home from "./pages/Home/Home";
+import ServiceDetail from "./pages/ServiceDetail/ServiceDetail";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -68,6 +69,7 @@ function App() {
             }
           >
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="categories" element={<CategoryManagement />} />
             <Route path="services" element={<ServiceManagement />} />
             <Route path="bookings" element={<BookingManagement />} />
             <Route path="customers" element={<AdminPlaceholder title="Quan ly khach hang" />} />
@@ -78,7 +80,8 @@ function App() {
             <Route path="*" element={<Navigate to="services" replace />} />
           </Route>
           <Route path="/services" element={<ServiceList />} />
-          <Route path="/services/:id" element={<ServiceDetail />} />
+          <Route path="/services/:categoryName" element={<ServiceList />} />
+          <Route path="/services/detail/:id" element={<ServiceDetail />} />
           <Route path="/home" element={<Home />} />
           <Route path="/service" element={<Navigate to="/services" replace />} />
           <Route path="/booking" element={<Booking />} />

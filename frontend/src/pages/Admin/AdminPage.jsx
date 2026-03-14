@@ -35,6 +35,9 @@ const AdminPage = () => {
           <a className={`nav-item ${location.pathname === "/admin/staffs" ? "active" : ""}`} href="/admin/staffs">
             Quản lý nhân viên
           </a>
+          <a className={`nav-item ${location.pathname === "/admin/categories" ? "active" : ""}`} href="/admin/categories">
+            Quản lý danh mục
+          </a>
           <a className={`nav-item ${location.pathname === "/admin/services" ? "active" : ""}`} href="/admin/services">
             Quản lý dịch vụ
           </a>

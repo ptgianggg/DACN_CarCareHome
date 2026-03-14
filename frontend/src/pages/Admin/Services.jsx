@@ -4,6 +4,7 @@ import {
   deleteService,
   getServices,
   updateService,
+  getCategories,
 } from "../../services/api";
 import "./style.css";
 
@@ -43,6 +44,7 @@ function ServiceManagement() {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [detailService, setDetailService] = useState(null);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [localImageMap, setLocalImageMap] = useState(() => {
     try {
       const raw = localStorage.getItem(LOCAL_IMAGE_MAP_KEY);
@@ -63,12 +65,14 @@ function ServiceManagement() {
   async function fetchData() {
     setLoading(true);
     try {
-      const data = await getServices();
-      const list = Array.isArray(data) ? data.map(normalizeService) : [];
+      const [svcData, catData] = await Promise.all([getServices(), getCategories()]);
+      const list = Array.isArray(svcData) ? svcData.map(normalizeService) : [];
       setServices(list);
+      setCategoryOptions(Array.isArray(catData) ? catData : []);
     } catch (error) {
-      console.error("Fetch services error:", error);
+      console.error("Fetch data error:", error);
       setServices([]);
+      setCategoryOptions([]);
     } finally {
       setLoading(false);
     }
@@ -353,13 +357,19 @@ function ServiceManagement() {
 
               <label>
                 Nhom dich vu
-                <input
+                <select
                   name="category"
                   value={form.category}
                   onChange={onChange}
-                  placeholder="Bao duong / Noi that..."
                   required
-                />
+                >
+                  <option value="">-- Chon danh muc --</option>
+                  {categoryOptions.map(cat => (
+                    <option key={cat.id || cat.name} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label>

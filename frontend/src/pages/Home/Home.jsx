@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getServices } from "../../services/api";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import "./Home.css";
 
 const fallbackFeaturedServices = [
@@ -97,84 +99,11 @@ function Home() {
   }
 
   return (
-    <main className="home-page">
-      <div className="home-glow home-glow-1" />
-      <div className="home-glow home-glow-2" />
-
-      <header className="home-nav">
-        <div className="home-brand">
-          <span className="home-brand-mark">CC</span>
-          <span>CarCareHome</span>
-        </div>
-        <nav className="home-menu">
-          <Link to="/home">Trang chủ</Link>
-          <div
-            className={`home-menu-dropdown ${isServiceMenuOpen ? "open" : ""}`}
-            onMouseEnter={() => setIsServiceMenuOpen(true)}
-            onMouseLeave={() => setIsServiceMenuOpen(false)}
-          >
-            <button
-              type="button"
-              className="home-menu-trigger"
-              aria-haspopup="true"
-              aria-expanded={isServiceMenuOpen}
-              onClick={() => setIsServiceMenuOpen((prev) => !prev)}
-            >
-              Dịch vụ
-            </button>
-            <div className="home-dropdown-panel">
-              <Link to="/services" onClick={() => setIsServiceMenuOpen(false)}>
-                Tất cả dịch vụ
-              </Link>
-              {dropdownServices.length
-                ? dropdownServices.map((service) => (
-                    <Link
-                      key={service.id}
-                      to={`/services/${service.id}`}
-                      onClick={() => setIsServiceMenuOpen(false)}
-                    >
-                      {service.name}
-                    </Link>
-                  ))
-                : fallbackFeaturedServices.map((service) => (
-                    <Link key={service.title} to="/services" onClick={() => setIsServiceMenuOpen(false)}>
-                      {service.title}
-                    </Link>
-                  ))}
-            </div>
-          </div>
-          <a href="#products">Sản phẩm</a>
-          <a href="#contact">Liên hệ</a>
-        </nav>
-        <div className="home-nav-actions">
-          {currentUser ? (
-            <>
-              <span className="home-user-pill">Xin chào, {displayName}</span>
-              {isAdmin ? (
-                <button
-                  type="button"
-                  className="home-secondary-btn"
-                  onClick={() => navigate("/admin")}
-                >
-                  Quản trị
-                </button>
-              ) : null}
-              <button type="button" className="home-link-btn" onClick={onLogout}>
-                Đăng xuất
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="home-link-btn">
-                Đăng nhập
-              </Link>
-              <Link to="/register" className="home-primary-btn">
-                Đăng ký
-              </Link>
-            </>
-          )}
-        </div>
-      </header>
+    <>
+      <Header />
+      <main className="home-page">
+        <div className="home-glow home-glow-1" />
+        <div className="home-glow home-glow-2" />
 
       <section className="home-hero">
         <p className="home-eyebrow">Premium Auto Care</p>
@@ -242,7 +171,9 @@ function Home() {
           TP.HCM.
         </p>
       </section>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }
 
