@@ -24,7 +24,12 @@ function getCurrentUser() {
 
 function isAdminUser(user) {
   const role = String(user?.role || "").toUpperCase();
-  return role === "ADMIN" || role === "ROLE_ADMIN";
+  return (
+    role === "ADMIN" ||
+    role === "ROLE_ADMIN" ||
+    role === "MANAGER" ||
+    role === "ROLE_MANAGER"
+  );
 }
 
 function AdminRoute({ children }) {
@@ -53,41 +58,48 @@ function AdminPlaceholder({ title }) {
 }
 
 function App() {
+  const appRouter = (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="services" element={<ServiceManagement />} />
+          <Route path="bookings" element={<BookingManagement />} />
+          <Route path="customers" element={<AdminPlaceholder title="Quan ly khach hang" />} />
+          <Route path="staffs" element={<AdminPlaceholder title="Quan ly nhan vien" />} />
+          <Route path="reports" element={<AdminPlaceholder title="Bao cao thong ke" />} />
+          <Route path="settings" element={<AdminPlaceholder title="Cai dat" />} />
+          <Route index element={<Navigate to="services" replace />} />
+          <Route path="*" element={<Navigate to="services" replace />} />
+        </Route>
+        <Route path="/services" element={<ServiceList />} />
+        <Route path="/services/:id" element={<ServiceDetail />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/service" element={<Navigate to="/services" replace />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+
+  if (!GOOGLE_CLIENT_ID) {
+    return appRouter;
+  }
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPage />
-              </AdminRoute>
-            }
-          >
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="services" element={<ServiceManagement />} />
-            <Route path="bookings" element={<BookingManagement />} />
-            <Route path="customers" element={<AdminPlaceholder title="Quan ly khach hang" />} />
-            <Route path="staffs" element={<AdminPlaceholder title="Quan ly nhan vien" />} />
-            <Route path="reports" element={<AdminPlaceholder title="Bao cao thong ke" />} />
-            <Route path="settings" element={<AdminPlaceholder title="Cai dat" />} />
-            <Route index element={<Navigate to="services" replace />} />
-            <Route path="*" element={<Navigate to="services" replace />} />
-          </Route>
-          <Route path="/services" element={<ServiceList />} />
-          <Route path="/services/:id" element={<ServiceDetail />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/service" element={<Navigate to="/services" replace />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
+      {appRouter}
     </GoogleOAuthProvider>
-
   );
 }
 

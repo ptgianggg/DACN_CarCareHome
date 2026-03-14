@@ -53,42 +53,67 @@ export const register = async (user) => {
 };
 
 export const login = async (user) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(user)
-  });
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(user)
+    });
 
-  const data = await res.json();
+    if (!res.ok) {
+      const message = await parseErrorMessage(res, "Dang nhap that bai");
+      return { error: true, message };
+    }
 
-  // lưu token ngay khi login thành công
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data));
+    const data = await res.json();
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Login API ERROR:", error);
+    return {
+      error: true,
+      message: "Khong the ket noi server"
+    };
   }
-
-  return data;
 };
 
 export const googleLogin = async (tokenId) => {
-  const res = await fetch(`${API_URL}/auth/google-login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ tokenId })
-  });
+  try {
+    const res = await fetch(`${API_URL}/auth/google-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ tokenId })
+    });
 
-  const data = await res.json();
+    if (!res.ok) {
+      const message = await parseErrorMessage(res, "Dang nhap Google that bai");
+      return { error: true, message };
+    }
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data));
+    const data = await res.json();
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Google Login API ERROR:", error);
+    return {
+      error: true,
+      message: "Khong the ket noi server"
+    };
   }
-
-  return data;
 };
 
 // ===============================

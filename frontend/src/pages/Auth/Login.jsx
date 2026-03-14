@@ -5,6 +5,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
 function Login() {
+  const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +35,7 @@ function Login() {
         setError(data.message || "Email hoặc mật khẩu không đúng.");
       }
     } catch (err) {
-      setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
+      setError(err?.message || "Da co loi xay ra. Vui long thu lai.");
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ function Login() {
         setError(data.message || "Đăng nhập Google thất bại.");
       }
     } catch (err) {
-      setError("Đã có lỗi xảy ra khi đăng nhập Google.");
+      setError(err?.message || "Da co loi xay ra khi dang nhap Google.");
     } finally {
       setLoading(false);
     }
@@ -222,15 +223,19 @@ function Login() {
             </div>
 
             <div className="social-login">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                useOneTap
-                theme="filled_blue"
-                shape="pill"
-                locale="vi"
-                width="100%"
-              />
+              {hasGoogleClientId ? (
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  useOneTap
+                  theme="filled_blue"
+                  shape="pill"
+                  locale="vi"
+                  width="100%"
+                />
+              ) : (
+                <p className="auth-error">Google login chua duoc cau hinh VITE_GOOGLE_CLIENT_ID.</p>
+              )}
             </div>
 
             <div className="auth-footer">

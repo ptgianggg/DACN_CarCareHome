@@ -3,24 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { getServices } from "../../services/api";
 import "./Home.css";
 
-const fallbackFeaturedServices = [
-  {
-    title: "Bảo dưỡng tổng quát",
-    desc: "Kiểm tra 18 hạng mục, thay dầu, lọc gió và cân chỉnh cơ bản.",
-    meta: "90 - 120 phút",
-  },
-  {
-    title: "Chăm sóc nội thất",
-    desc: "Vệ sinh ghế, trần, tapi cửa và khử mùi nội thất chuyên sâu.",
-    meta: "120 phút",
-  },
-  {
-    title: "Phủ ceramic",
-    desc: "Tăng độ bóng, hạn chế bám nước và bảo vệ sơn xe bền hơn.",
-    meta: "180 - 240 phút",
-  },
-];
-
 const steps = [
   "Đặt lịch online trong 1 phút",
   "Nhận xe, kiểm tra nhanh và xác nhận hạng mục",
@@ -46,7 +28,11 @@ function Home() {
   const displayName =
     currentUser?.name?.trim() || currentUser?.email?.trim() || "bạn";
   const role = String(currentUser?.role || "").toUpperCase();
-  const isAdmin = role === "ADMIN" || role === "ROLE_ADMIN";
+  const canAccessAdmin =
+    role === "ADMIN" ||
+    role === "ROLE_ADMIN" ||
+    role === "MANAGER" ||
+    role === "ROLE_MANAGER";
 
   useEffect(() => {
     let isMounted = true;
@@ -74,7 +60,7 @@ function Home() {
   );
 
   const featuredServices = useMemo(() => {
-    if (!activeServices.length) return fallbackFeaturedServices;
+    if (!activeServices.length) return [];
 
     return activeServices.slice(0, 3).map((service) => ({
       id: service.id,
@@ -126,21 +112,15 @@ function Home() {
               <Link to="/services" onClick={() => setIsServiceMenuOpen(false)}>
                 Tất cả dịch vụ
               </Link>
-              {dropdownServices.length
-                ? dropdownServices.map((service) => (
-                    <Link
-                      key={service.id}
-                      to={`/services/${service.id}`}
-                      onClick={() => setIsServiceMenuOpen(false)}
-                    >
-                      {service.name}
-                    </Link>
-                  ))
-                : fallbackFeaturedServices.map((service) => (
-                    <Link key={service.title} to="/services" onClick={() => setIsServiceMenuOpen(false)}>
-                      {service.title}
-                    </Link>
-                  ))}
+              {dropdownServices.map((service) => (
+                <Link
+                  key={service.id}
+                  to={`/services/${service.id}`}
+                  onClick={() => setIsServiceMenuOpen(false)}
+                >
+                  {service.name}
+                </Link>
+              ))}
             </div>
           </div>
           <a href="#products">Sản phẩm</a>
@@ -150,7 +130,7 @@ function Home() {
           {currentUser ? (
             <>
               <span className="home-user-pill">Xin chào, {displayName}</span>
-              {isAdmin ? (
+              {canAccessAdmin ? (
                 <button
                   type="button"
                   className="home-secondary-btn"
@@ -199,13 +179,21 @@ function Home() {
           <h2>Lựa chọn phù hợp cho mọi tình trạng xe</h2>
         </div>
         <div className="home-service-grid">
-          {featuredServices.map((service) => (
-            <article key={service.title} className="home-service-card">
-              <h3>{service.title}</h3>
-              <p>{service.desc}</p>
-              <span>{service.meta}</span>
+          {featuredServices.length ? (
+            featuredServices.map((service) => (
+              <article key={service.id || service.title} className="home-service-card">
+                <h3>{service.title}</h3>
+                <p>{service.desc}</p>
+                <span>{service.meta}</span>
+              </article>
+            ))
+          ) : (
+            <article className="home-service-card">
+              <h3>Chua co dich vu nao</h3>
+              <p>Du lieu se hien thi khi ban them dich vu trong MySQL.</p>
+              <span>Vui long quay lai sau</span>
             </article>
-          ))}
+          )}
         </div>
       </section>
 
